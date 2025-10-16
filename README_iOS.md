@@ -35,14 +35,12 @@ Una app llamada **iOS_ComfyUI.app** que:
    - **Pasar entrada:** *ninguna*  
 5️⃣ Copia y pega el siguiente script:
 
-# === Iniciar ComfyUI (ruta fija y zsh compatible) ===
+# === Iniciar ComfyUI (ruta fija y compatible con macOS) ===
 set -e
 set -o pipefail
 
-# Ruta exacta de tu instalación
 ROOT="/Users/lucaselser/Documents/ComfyUI"
 
-# Verificar que existe main.py
 if [ ! -f "$ROOT/main.py" ]; then
   osascript -e 'display alert "No encuentro ComfyUI en /Users/lucaselser/Documents/ComfyUI.\nRevisa la ruta o ajusta el script." as warning'
   exit 1
@@ -50,20 +48,16 @@ fi
 
 cd "$ROOT"
 
-# Crear entorno virtual si no existe
 if [ ! -d "venv" ]; then
   /usr/bin/python3 -m venv venv
 fi
 
-# Activar entorno virtual (si existe)
 if [ -f "venv/bin/activate" ]; then
   source "venv/bin/activate"
 fi
 
-# Lanzar ComfyUI en segundo plano
 nohup python3 main.py >/tmp/comfyui.log 2>&1 &
 
-# Esperar hasta que el servidor responda y abrir navegador
 URL="http://127.0.0.1:8188"
 COUNT=0
 MAX_WAIT=90
@@ -76,4 +70,4 @@ while [ $COUNT -lt $MAX_WAIT ]; do
   sleep 1
 done
 
-open "$URL"
+/usr/bin/open "http://127.0.0.1:8188"
