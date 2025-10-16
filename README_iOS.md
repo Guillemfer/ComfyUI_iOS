@@ -35,52 +35,37 @@ Una app llamada **iOS_ComfyUI.app** que:
    - **Pasar entrada:** *ninguna*  
 5️⃣ Copia y pega el siguiente script:
 
-# Iniciar ComfyUI (Automator, zsh)
+# === Iniciar ComfyUI (ruta fija) ===
 set -e
 set -o pipefail
 
-# 1) Detectar carpeta (Documents o Documentos)
-ROOT="$HOME/Documents/ComfyUI"
-if [ ! -d "$ROOT" ]; then
-  ALT="$HOME/Documentos/ComfyUI"
-  if [ -d "$ALT" ]; then
-    ROOT="$ALT"
-  fi
-fi
+# Ruta exacta de tu instalación
+ROOT="/Users/lucaselser/Documents/ComfyUI"
 
-# 2) Validar que existe main.py
+# Verificar que existe main.py
 if [ ! -f "$ROOT/main.py" ]; then
-  osascript -e 'display alert "No encuentro ComfyUI en:\n~/Documents/ComfyUI\nni en ~/Documentos/ComfyUI.\n\nAjusta la ruta en la app de Automator." as warning'
+  osascript -e 'display alert "No encuentro ComfyUI en /Users/lucaselser/Documents/ComfyUI.\nRevisa la ruta o ajusta el script." as warning'
   exit 1
 fi
 
 cd "$ROOT"
 
-# 3) Localizar python3
-PY="/usr/bin/python3"
-if ! [ -x "$PY" ]; then
-  if command -v python3 >/dev/null 2>&1; then
-    PY="$(command -v python3)"
-  else
-    osascript -e 'display alert "No se encontró python3 en el sistema." as critical'
-    exit 1
-  fi
+# Crear entorno virtual si no existe
+if [ ! -d "venv" ]; then
+  /usr/bin/python3 -m venv venv
 fi
 
-# 4) Crear/activar venv (idempotente)
-if [ ! -d "venv" ]; then
-  "$PY" -m venv venv
-fi
+# Activar entorno virtual (si existe)
 if [ -f "venv/bin/activate" ]; then
   source "venv/bin/activate"
 fi
 
-# 5) Lanzar ComfyUI en background (silencioso)
-nohup python main.py >/tmp/comfyui.log 2>&1 &
+# Lanzar ComfyUI en segundo plano
+nohup python3 main.py >/tmp/comfyui.log 2>&1 &
 
-# 6) Esperar a que el puerto responda y abrir navegador
+# Esperar a que arranque el servidor y abrir navegador
 URL="http://127.0.0.1:8188"
-for i in {1..120}; do
+for i in {1..90}; do
   if /usr/bin/curl -sf --max-time 1 "$URL" >/dev/null 2>&1; then
     break
   fi
@@ -88,3 +73,4 @@ for i in {1..120}; do
 done
 
 open "$URL"
+
