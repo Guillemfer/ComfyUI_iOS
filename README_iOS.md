@@ -35,7 +35,7 @@ Una app llamada **iOS_ComfyUI.app** que:
    - **Pasar entrada:** *ninguna*  
 5️⃣ Copia y pega el siguiente script:
 
-# === Iniciar ComfyUI (ruta fija) ===
+# === Iniciar ComfyUI (ruta fija y zsh compatible) ===
 set -e
 set -o pipefail
 
@@ -63,14 +63,17 @@ fi
 # Lanzar ComfyUI en segundo plano
 nohup python3 main.py >/tmp/comfyui.log 2>&1 &
 
-# Esperar a que arranque el servidor y abrir navegador
+# Esperar hasta que el servidor responda y abrir navegador
 URL="http://127.0.0.1:8188"
-for i in {1..90}; do
+COUNT=0
+MAX_WAIT=90
+
+while [ $COUNT -lt $MAX_WAIT ]; do
   if /usr/bin/curl -sf --max-time 1 "$URL" >/dev/null 2>&1; then
     break
   fi
+  COUNT=$((COUNT + 1))
   sleep 1
 done
 
 open "$URL"
-
