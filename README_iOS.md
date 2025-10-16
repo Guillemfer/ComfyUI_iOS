@@ -36,6 +36,7 @@ Una app llamada **iOS_ComfyUI.app** que:
 5️⃣ Copia y pega el siguiente script:
 
 # === Iniciar ComfyUI (ruta fija y compatible con macOS) ===
+# === Iniciar ComfyUI (ruta fija y totalmente compatible con macOS) ===
 set -e
 set -o pipefail
 
@@ -70,4 +71,4 @@ while [ $COUNT -lt $MAX_WAIT ]; do
   sleep 1
 done
 
-/usr/bin/open "http://127.0.0.1:8188"
+/usr/bin/open "$URL"
